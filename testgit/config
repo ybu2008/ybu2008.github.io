@@ -1,0 +1,8 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = https://github.com/ybu2008/ybu2008.github.com
+	fetch = +refs/heads/*:refs/remotes/origin/*
