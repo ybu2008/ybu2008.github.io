@@ -23,7 +23,102 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="http://ybu2008.github.io/Failed to set locale, defaulting to C.html">yum:Failed to set locale, defaulting to C</a></h1>
+                    <h1 class="entry-title"><a href="http://ybu2008.github.io/Expriment B2BUA Recording By Freeswitch.html">Expriment:B2BUA && Recording By Freeswitch</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-01-22T15:52:22+01:00">
+                Published: Fri 22 January 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
+        </address>
+<p>In <a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a>.</p>
+<p>tags: <a href="http://ybu2008.github.io/tag/freeswitch.html">freeswitch</a> <a href="http://ybu2008.github.io/tag/b2bua.html">B2BUA</a> <a href="http://ybu2008.github.io/tag/recording.html">Recording</a> </p>
+</footer><!-- /.post-info --><h1>模拟项目录音服务器</h1>
+<p>录音服务器功能：B2BUA、recording<br />
+freeswitch默认是B2BUA的工作方式；recording可以通过dialplan的default.xml中加入action完成。  </p>
+<h1>实验环境：</h1>
+<p>freeswitch A：windows 2003<br />
+freeswitch B：centos 6.6 x86_64<br />
+终端A（1000）和B（1002），A呼叫B；<br />
+<img alt="部署结构" src="/img/freeswitch/b2bua" title="recording.png" />  </p>
+<h1>sip配置：</h1>
+<p>freeswitchA需要把A的呼叫invite送到freeswitch B上，修改dialplan的default.xml，内容如下：  </p>
+<div class="highlight"><pre><span class="o">&lt;</span><span class="n">extension</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;Test_1&quot;</span><span class="o">&gt;</span>  
+    <span class="o">&lt;</span><span class="n">condition</span> <span class="n">field</span><span class="o">=</span><span class="s">&quot;destination_number&quot;</span> <span class="n">expression</span><span class="o">=</span><span class="s">&quot;^0(.*)$&quot;</span><span class="o">&gt;</span>  
+        <span class="o">&lt;</span><span class="n">action</span> <span class="n">application</span><span class="o">=</span><span class="s">&quot;bridge&quot;</span> <span class="n">data</span><span class="o">=</span><span class="s">&quot;sofia/external/sip:$1@192.168.0.182:5080&quot;</span><span class="o">/&gt;</span>  
+    <span class="o">&lt;/</span><span class="n">condition</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">extension</span><span class="o">&gt;</span>
+</pre></div>
+
+
+<p>192.168.0.182:5080为freeswitch B的realm，拨号规则为0开头的所有被叫号码（去掉第一个0）送到freeswitch B；sofia/external/sip作用是什么？）该extension放在context的第一位。<br />
+在freeswitch的console中执行reloadxml。  </p>
+<p>freeswitchB需要响应A的invite，同时向freeswitch A发起invite B，修改dialplan的default.xml，内容如下：  </p>
+<div class="highlight"><pre><span class="o">&lt;</span><span class="n">extension</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;B2BUA&quot;</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">condition</span> <span class="n">field</span><span class="o">=</span><span class="s">&quot;destination_number&quot;</span> <span class="n">expression</span><span class="o">=</span><span class="s">&quot;(.*)$&quot;</span><span class="o">&gt;</span>
+     <span class="o">&lt;</span><span class="n">action</span> <span class="n">application</span><span class="o">=</span><span class="s">&quot;bridge&quot;</span> <span class="n">data</span><span class="o">=</span><span class="s">&quot;sofia/external/sip:$1@192.168.0.112:5080&quot;</span><span class="o">/&gt;</span>
+  <span class="o">&lt;/</span><span class="n">condition</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">extension</span><span class="o">&gt;</span>
+</pre></div>
+
+
+<p>192.168.0.112:5080为freeswitch A的realm，拨号规则为任意的号码送到freeswitch A，该extension放在context的第一位。<br />
+在freeswitch的console中执行reloadxml。  </p>
+<p>测试，在1002拨打01000，呼叫建立成功；  </p>
+<h1>录音配置</h1>
+<p>修改freeswitch B的dialplan default.xml，在刚才的B2BUA extension condition追加下述action：  </p>
+<div class="highlight"><pre>    <span class="nt">&lt;action</span> <span class="na">application=</span><span class="s">&quot;set&quot;</span> <span class="na">data=</span><span class="s">&quot;RECORD_TITLE=Recording_</span><span class="cp">${</span><span class="n">destination_number</span><span class="cp">}</span><span class="s">_</span><span class="cp">${</span><span class="n">caller_id_number</span><span class="cp">}</span><span class="s">_</span><span class="cp">${</span><span class="n">strftime</span><span class="p">(</span><span class="o">%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span> <span class="o">%</span><span class="n">H</span><span class="p">:</span><span class="o">%</span><span class="n">M</span><span class="p">)</span><span class="cp">}</span><span class="s">&quot;/</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;action</span> <span class="na">application=</span><span class="s">&quot;set&quot;</span> <span class="na">data=</span><span class="s">&quot;RECORD_COPYRIGHT=(c)2011&quot;/</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;action</span> <span class="na">application=</span><span class="s">&quot;set&quot;</span> <span class="na">data=</span><span class="s">&quot;RECORD_SOFTWARE=FreeSWITCH&quot;/</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;action</span> <span class="na">application=</span><span class="s">&quot;set&quot;</span> <span class="na">data=</span><span class="s">&quot;RECORD_ARTIST=FreeSWITCH&quot;/</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;action</span> <span class="na">application=</span><span class="s">&quot;set&quot;</span> <span class="na">data=</span><span class="s">&quot;RECORD_COMMENT=FreeSWITCH&quot;/</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;action</span> <span class="na">application=</span><span class="s">&quot;set&quot;</span> <span class="na">data=</span><span class="s">&quot;RECORD_DATE=</span><span class="cp">${</span><span class="n">strftime</span><span class="p">(</span><span class="o">%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span> <span class="o">%</span><span class="n">H</span><span class="p">:</span><span class="o">%</span><span class="n">M</span><span class="p">)</span><span class="cp">}</span><span class="s">&quot;/</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;action</span> <span class="na">application=</span><span class="s">&quot;set&quot;</span> <span class="na">data=</span><span class="s">&quot;RECORD_STEREO=true&quot;/</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;action</span> <span class="na">application=</span><span class="s">&quot;record_session&quot;</span> <span class="na">data=</span><span class="s">&quot;</span><span class="err">$$</span><span class="s">{base_dir}/recordings/archive/</span><span class="cp">${</span><span class="n">strftime</span><span class="p">(</span><span class="o">%</span><span class="n">Y</span><span class="o">-%</span><span class="n">m</span><span class="o">-%</span><span class="n">d</span><span class="o">-%</span><span class="n">H</span><span class="o">-%</span><span class="n">M</span><span class="o">-%</span><span class="n">S</span><span class="p">)</span><span class="cp">}</span><span class="s">_</span><span class="cp">${</span><span class="n">destination_number</span><span class="cp">}</span><span class="s">_</span><span class="cp">${</span><span class="n">caller_id_number</span><span class="cp">}</span><span class="s">.wav&quot;/</span><span class="nt">&gt;</span>
+</pre></div>
+
+
+<p>在freeswitch的console中执行reloadxml。  </p>
+<p>测试，在1002拨打01000，呼叫建立成功，并在freeswitch所在目录的recordings/archive下产生录音文件；  </p>
+<h1>后续工作</h1>
+<p>如果用于项目还需要修改配置，例如：<br />
+1、freeswitch出去的sdp  </p>
+<div class="highlight"><pre>Remote SDP:  
+v=0  
+o=FreeSWITCH 1453409815 1453409816 IN IP4 192.168.0.110  
+s=FreeSWITCH  
+c=IN IP4 192.168.0.110  
+t=0 0  
+m=audio 22390 RTP/AVP 8 3 101 13  
+a=rtpmap:8 PCMA/8000  
+a=rtpmap:3 GSM/8000  
+a=rtpmap:101 telephone-event/8000  
+a=fmtp:101 0-16  
+a=ptime:20  
+o和s的字段FreeSWITCH可能需要改为其他的。
+</pre></div>
+
+
+<p>2、freeswitch在通话过程中发送info，这信令需要去掉；  </p>
+<p>参考资料：<br />
+http://blog.csdn.net/dreamcode/article/details/8456910
+http://www.freeswitch.org.cn/2012/03/28/duo-tai-freeswitch-fu-wu-qi-ji-lian.html</p>
+<p>附带：<br />
+<a href="http://download.csdn.net/download/a361390227/7358935">freeswitch 1.2中文下载地址</a></p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="http://ybu2008.github.io/Failed to set locale, defaulting to C.html" rel="bookmark"
+                           title="Permalink to yum:Failed to set locale, defaulting to C">yum:Failed to set locale, defaulting to C</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-01-21T17:41:22+01:00">
                 Published: Thu 21 January 2016
@@ -34,30 +129,10 @@
         </address>
 <p>In <a href="http://ybu2008.github.io/category/linux.html">linux</a>.</p>
 <p>tags: <a href="http://ybu2008.github.io/tag/yum-locale.html">yum locale</a> </p>
-</footer><!-- /.post-info --><ul>
-<li>环境：centos 6.6 x86_64  </li>
-<li>描述：yum使用时报Failed to set locale, defaulting to C，执行locale命令(设置语言环境)：  </li>
-</ul>
-<div class="highlight"><pre>01.locale：Cannot <span class="nb">set </span>LC_CTYPE to default locale： No such file or directory
-02.locale：Cannot <span class="nb">set </span>LC_MESSAGES to default locale： No such file or directory
-03.locale：Cannot <span class="nb">set </span>LC_ALL to default locale： No such file or directory 
-</pre></div>
-
-
-<ul>
-<li>解决：  </li>
-</ul>
-<div class="highlight"><pre><span class="nb">echo</span> <span class="s2">&quot;export LC_ALL=en_US.UTF-8&quot;</span>  &gt;&gt;  /etc/profile
-<span class="nb">source</span> /etc/profile
-</pre></div>
-
-
-<p><strong>版权声明：本文为博主原创文章，未经博主允许不得转载。</strong></p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Failed to set locale, defaulting to C</p>
+                <a class="readmore" href="http://ybu2008.github.io/Failed to set locale, defaulting to C.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
