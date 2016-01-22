@@ -41,22 +41,22 @@
 <p>tags: <a href="http://ybu2008.github.io/tag/yum-locale.html">yum locale</a> </p>
 </footer><!-- /.post-info -->      <ul>
 <li>环境：centos 6.6 x86_64  </li>
-<li>
-<p>描述：yum使用时报Failed to set locale, defaulting to C，执行locale命令(设置语言环境)：<br />
-'''sh
-01.locale：Cannot set LC_CTYPE to default locale： No such file or directory
-02.locale：Cannot set LC_MESSAGES to default locale： No such file or directory
-03.locale：Cannot set LC_ALL to default locale： No such file or directory 
-'''  </p>
-</li>
-<li>
-<p>解决：<br />
-'''sh
-echo "export LC_ALL=en_US.UTF-8"  &gt;&gt;  /etc/profile
-source /etc/profile
-'''</p>
-</li>
+<li>描述：yum使用时报Failed to set locale, defaulting to C，执行locale命令(设置语言环境)：  </li>
 </ul>
+<div class="highlight"><pre>01.locale：Cannot <span class="nb">set </span>LC_CTYPE to default locale： No such file or directory
+02.locale：Cannot <span class="nb">set </span>LC_MESSAGES to default locale： No such file or directory
+03.locale：Cannot <span class="nb">set </span>LC_ALL to default locale： No such file or directory 
+</pre></div>
+
+
+<ul>
+<li>解决：  </li>
+</ul>
+<div class="highlight"><pre><span class="nb">echo</span> <span class="s2">&quot;export LC_ALL=en_US.UTF-8&quot;</span>  &gt;&gt;  /etc/profile
+<span class="nb">source</span> /etc/profile
+</pre></div>
+
+
 <p><strong>版权声明：本文为博主原创文章，未经博主允许不得转载。</strong></p>
     </div><!-- /.entry-content -->
 

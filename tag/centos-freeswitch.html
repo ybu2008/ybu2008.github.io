@@ -34,111 +34,125 @@
         </address>
 <p>In <a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a>.</p>
 <p>tags: <a href="http://ybu2008.github.io/tag/centos-freeswitch.html">centos freeswitch</a> </p>
-</footer><!-- /.post-info --><h3>下载源代码</h3>
-<p>'''sh 
-git clone https://freeswitch.org/stash/scm/fs/freeswitch.git
-'''  </p>
-<h3>准备依赖</h3>
-<p>'''sh 
-cd freeswitch
-sh support-d/prereq.sh</p>
-<p>yum -y install curl-devel pcre-devel speex-devel ldns-devel lua-devel libsndfile-devel </p>
-<p>cd freeswitch/libs
-'''  </p>
-<h3>编译libyuv</h3>
-<p>'''sh 
-git clone https://freeswitch.org/stash/scm/sd/libyuv.git
-cd libyuv
-make -f linux.mk CXXFLAGS="-fPIC -O2 -fomit-frame-pointer -Iinclude/"
+</footer><!-- /.post-info --><h3>1、下载源代码</h3>
+<div class="highlight"><pre>git clone https://freeswitch.org/stash/scm/fs/freeswitch.git
+</pre></div>
+
+
+<h3>2、准备依赖</h3>
+<div class="highlight"><pre><span class="nb">cd </span>freeswitch
+sh support-d/prereq.sh
+
+yum -y install curl-devel pcre-devel speex-devel ldns-devel lua-devel libsndfile-devel 
+
+<span class="nb">cd </span>freeswitch/libs
+</pre></div>
+
+
+<h3>3、编译libyuv</h3>
+<div class="highlight"><pre>git clone https://freeswitch.org/stash/scm/sd/libyuv.git
+<span class="nb">cd </span>libyuv
+make -f linux.mk <span class="nv">CXXFLAGS</span><span class="o">=</span><span class="s2">&quot;-fPIC -O2 -fomit-frame-pointer -Iinclude/&quot;</span>
 make install
 cp /usr/lib/pkgconfig/libyuv.pc /usr/lib64/pkgconfig/
-cd ..
-'''  </p>
-<h3>下载yasm并编译</h3>
-<p>'''sh 
-yasm是一个汇编编译器，是nasm的升级版
+<span class="nb">cd</span> ..
+</pre></div>
+
+
+<h3>4、下载yasm并编译</h3>
+<div class="highlight"><pre>yasm是一个汇编编译器，是nasm的升级版
 wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
 tar -zxvf yasm-1.3.0.tar.gz
-cd yasm-1.3.0
+<span class="nb">cd </span>yasm-1.3.0
 ./configure
-make &amp;&amp; make install
-cd ..<br />
-'''  </p>
-<h3>编译VPX</h3>
-<p>'''sh 
-git clone https://freeswitch.org/stash/scm/sd/libvpx.git
-cd libvpx
+make <span class="o">&amp;&amp;</span> make install
+<span class="nb">cd</span> ..  
+</pre></div>
+
+
+<h3>5、编译VPX</h3>
+<div class="highlight"><pre>git clone https://freeswitch.org/stash/scm/sd/libvpx.git
+<span class="nb">cd </span>libvpx
 ./configure --enable-pic --disable-static --enable-shared
 make
 make install
 cp /usr/local/lib/pkgconfig/vpx.pc /usr/lib64/pkgconfig/
-cd ..
-'''  </p>
-<h3>编译OPUS</h3>
-<p>'''sh 
-git clone https://freeswitch.org/stash/scm/sd/opus.git
-cd opus
+<span class="nb">cd</span> ..
+</pre></div>
+
+
+<h3>6、编译OPUS</h3>
+<div class="highlight"><pre>git clone https://freeswitch.org/stash/scm/sd/opus.git
+<span class="nb">cd </span>opus
 ./autogen.sh
 ./configure
 make
 make install
 cp /usr/local/lib/pkgconfig/opus.pc /usr/lib64/pkgconfig
-cd ..
-'''  </p>
-<h3>编译libpng</h3>
-<p>'''sh 
-git clone https://freeswitch.org/stash/scm/sd/libpng.git
-cd libpng
+<span class="nb">cd</span> ..
+</pre></div>
+
+
+<h3>7、编译libpng</h3>
+<div class="highlight"><pre>git clone https://freeswitch.org/stash/scm/sd/libpng.git
+<span class="nb">cd </span>libpng
  ./configure
 make
 make install
 cp /usr/local/lib/pkgconfig/libpng* /usr/lib64/pkgconfig/
-pkg-config --list-all | grep png
-cd ..
-'''  </p>
-<h3>编译&amp;安装</h3>
-<p>'''sh 
-./bootstrap.sh -j
+pkg-config --list-all <span class="p">|</span> grep png
+<span class="nb">cd</span> ..
+</pre></div>
+
+
+<h3>8、编译&amp;安装</h3>
+<div class="highlight"><pre>./bootstrap.sh -j
 ./configure -C
 make
 make install
-'''  </p>
-<h3>Install CD-Quality Sounds</h3>
-<p>'''sh 
-make cd-sounds-install
-make cd-moh-install
-'''  </p>
-<h3>Set Owner and Permissions</h3>
-<p>'''sh
-#create user 'freeswitch'
-#add it to group 'daemon'
-#change owner and group of the freeswitch installation
-cd /usr/local
+</pre></div>
+
+
+<h3>9、Install CD-Quality Sounds</h3>
+<div class="highlight"><pre>make <span class="nb">cd</span>-sounds-install
+make <span class="nb">cd</span>-moh-install
+</pre></div>
+
+
+<h3>10、Set Owner and Permissions</h3>
+<div class="highlight"><pre><span class="se">\#</span>create user <span class="s1">&#39;freeswitch&#39;</span>
+<span class="se">\#</span>add it to group <span class="s1">&#39;daemon&#39;</span>
+<span class="se">\#</span>change owner and group of the freeswitch installation
+<span class="nb">cd</span> /usr/local
 useradd --system --home-dir /usr/local/freeswitch -G daemon freeswitch
-passwd -l freeswitch</p>
-<p>chown -R freeswitch:daemon /usr/local/freeswitch/ 
-chmod -R 770 /usr/local/freeswitch/
-chmod -R 750 /usr/local/freeswitch/bin/*</p>
-<p>mkdir /var/run/freeswitch
-chown -R freeswitch:daemon  /var/run/freeswitch</p>
-<p>ln -s /usr/local/freeswitch/bin/freeswitch /usr/bin/ # needed by /etc/init.d/freeswitch
-'''</p>
-<h3>设置LD_LIBRARY_PATH</h3>
-<p>编辑文件<br />
-'''sh 
-vi ~/.bash_profile
-# add libyuv.so path
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib
-'''  </p>
-<p>让配置生效
-'''sh 
-source ~/.bash_profile
-'''</p>
-<h3>启动</h3>
-<p>'''sh 
-cd /usr/local/freeswitch/bin
+passwd -l freeswitch
+
+chown -R freeswitch:daemon /usr/local/freeswitch/ 
+chmod -R <span class="m">770</span> /usr/local/freeswitch/
+chmod -R <span class="m">750</span> /usr/local/freeswitch/bin/*
+
+mkdir /var/run/freeswitch
+chown -R freeswitch:daemon  /var/run/freeswitch
+
+ln -s /usr/local/freeswitch/bin/freeswitch /usr/bin/ <span class="c"># needed by /etc/init.d/freeswitch</span>
+</pre></div>
+
+
+<h3>11、设置LD_LIBRARY_PATH</h3>
+<p>编辑文件  </p>
+<div class="highlight"><pre>vi ~/.bash_profile
+<span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:/usr/lib
+:wq
+<span class="nb">source</span> ~/.bash_profile
+</pre></div>
+
+
+<h3>12、启动</h3>
+<div class="highlight"><pre><span class="nb">cd</span> /usr/local/freeswitch/bin
 ./freeswitch
-'''</p>
+</pre></div>
+
+
 <p>参考资料：<br />
 https://freeswitch.org/confluence/display/FREESWITCH/CentOS+6?focusedCommentId=7766400#comment-7766400<br />
 http://www.8000hz.com/archives/freeswitch-git-compile-1-7.html<br />
@@ -147,25 +161,43 @@ http://www.cnblogs.com/hezhixiong/p/4797511.html</p>
 http://files.freeswitch.org/downloads/libs/</p>
 <p>安装过程中出现问题：
 在centos 6.6的x86 32位机器上安装到最后的freeswitch make，出现下述问题：
-make的时候报错：
-make[2]: Entering directory <code>/root/freeswitch.git'
-  CCLD   freeswitch
-/usr/lib//libyuv.so: undefined reference to</code>ScaleARGBRowDown2_SSE2'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown4_SSE2' </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDown2Box_SSE2'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown2Box_SSE2'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDownEvenBox_SSE2'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown34_0_Box_SSSE3'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown38_SSSE3'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDownEven_SSE2'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown38_3_Box_SSSE3'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown2_SSE2'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown34_1_Box_SSSE3'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown34_SSSE3'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown38_2_Box_SSSE3'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown4Box_SSE2'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown2Linear_SSE2'  </p>
-<p>/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDown2Linear_SSE2'  </p>
+make的时候报错： </p>
+<div class="highlight"><pre>make<span class="o">[</span>2<span class="o">]</span>: Entering directory <span class="sb">`</span>/root/freeswitch.git<span class="s1">&#39;</span>
+<span class="s1">  CCLD   freeswitch</span>
+<span class="s1">/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDown2_SSE2&#39;</span>  
+
+/usr/lib//libyuv.so: undefined reference to <span class="sb">`</span>ScaleRowDown4_SSE2<span class="s1">&#39; </span>
+
+<span class="s1">/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDown2Box_SSE2&#39;</span>  
+
+/usr/lib//libyuv.so: undefined reference to <span class="sb">`</span>ScaleRowDown2Box_SSE2<span class="s1">&#39;  </span>
+
+<span class="s1">/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDownEvenBox_SSE2&#39;</span>  
+
+/usr/lib//libyuv.so: undefined reference to <span class="sb">`</span>ScaleRowDown34_0_Box_SSSE3<span class="s1">&#39;  </span>
+
+<span class="s1">/usr/lib//libyuv.so: undefined reference to `ScaleRowDown38_SSSE3&#39;</span>  
+
+/usr/lib//libyuv.so: undefined reference to <span class="sb">`</span>ScaleARGBRowDownEven_SSE2<span class="s1">&#39;  </span>
+
+<span class="s1">/usr/lib//libyuv.so: undefined reference to `ScaleRowDown38_3_Box_SSSE3&#39;</span>  
+
+/usr/lib//libyuv.so: undefined reference to <span class="sb">`</span>ScaleRowDown2_SSE2<span class="s1">&#39;  </span>
+
+<span class="s1">/usr/lib//libyuv.so: undefined reference to `ScaleRowDown34_1_Box_SSSE3&#39;</span>  
+
+/usr/lib//libyuv.so: undefined reference to <span class="sb">`</span>ScaleRowDown34_SSSE3<span class="s1">&#39;  </span>
+
+<span class="s1">/usr/lib//libyuv.so: undefined reference to `ScaleRowDown38_2_Box_SSSE3&#39;</span>  
+
+/usr/lib//libyuv.so: undefined reference to <span class="sb">`</span>ScaleRowDown4Box_SSE2<span class="s1">&#39;  </span>
+
+<span class="s1">/usr/lib//libyuv.so: undefined reference to `ScaleRowDown2Linear_SSE2&#39;</span>  
+
+/usr/lib//libyuv.so: undefined reference to <span class="sb">`</span>ScaleARGBRowDown2Linear_SSE2<span class="err">&#39;</span>  
+</pre></div>
+
+
 <p>libyuv.so中找不到函数定义或没有找到libyuv.so，而在/usr/lib中是能够找到，并且freeswitch的makefile中也引用了"-L/usr/lib -lyuv"，然后最后没有解决该问题，后面改为在64位上编译就可以（应该与32位或64位关系不大，有可能是32位下的某个操作导致了错误）；</p>
 <p><strong>版权声明：本文为博主原创文章，未经博主允许不得转载。</strong></p>                </article>
             </aside><!-- /#featured -->
