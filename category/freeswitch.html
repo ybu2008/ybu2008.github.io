@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Zbaihong's Blog - freeswitch</title>
+        <link rel="stylesheet" href="http://ybu2008.github.io/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://ybu2008.github.io/">Zbaihong's Blog </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a></li>
+                    <li><a href="http://ybu2008.github.io/category/linux.html">linux</a></li>
+                    <li><a href="http://ybu2008.github.io/category/python.html">Python</a></li>
+                    <li><a href="http://ybu2008.github.io/category/resiprocate.html">ReSIProcate</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="http://ybu2008.github.io/centos 6.6 x86_64 freeswitch 1.7版本安装.html">centos 6.6 x86_64 freeswitch 1.7版本安装</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-01-21T17:41:22+01:00">
+                Published: Thu 21 January 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
+        </address>
+<p>In <a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a>.</p>
+<p>tags: <a href="http://ybu2008.github.io/tag/centos-freeswitch.html">centos freeswitch</a> </p>
+</footer><!-- /.post-info --><h3>下载源代码</h3>
+<p>'''sh 
+git clone https://freeswitch.org/stash/scm/fs/freeswitch.git
+'''  </p>
+<h3>准备依赖</h3>
+<p>'''sh 
+cd freeswitch
+sh support-d/prereq.sh</p>
+<p>yum -y install curl-devel pcre-devel speex-devel ldns-devel lua-devel libsndfile-devel </p>
+<p>cd freeswitch/libs
+'''  </p>
+<h3>编译libyuv</h3>
+<p>'''sh 
+git clone https://freeswitch.org/stash/scm/sd/libyuv.git
+cd libyuv
+make -f linux.mk CXXFLAGS="-fPIC -O2 -fomit-frame-pointer -Iinclude/"
+make install
+cp /usr/lib/pkgconfig/libyuv.pc /usr/lib64/pkgconfig/
+cd ..
+'''  </p>
+<h3>下载yasm并编译</h3>
+<p>'''sh 
+yasm是一个汇编编译器，是nasm的升级版
+wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+tar -zxvf yasm-1.3.0.tar.gz
+cd yasm-1.3.0
+./configure
+make &amp;&amp; make install
+cd ..<br />
+'''  </p>
+<h3>编译VPX</h3>
+<p>'''sh 
+git clone https://freeswitch.org/stash/scm/sd/libvpx.git
+cd libvpx
+./configure --enable-pic --disable-static --enable-shared
+make
+make install
+cp /usr/local/lib/pkgconfig/vpx.pc /usr/lib64/pkgconfig/
+cd ..
+'''  </p>
+<h3>编译OPUS</h3>
+<p>'''sh 
+git clone https://freeswitch.org/stash/scm/sd/opus.git
+cd opus
+./autogen.sh
+./configure
+make
+make install
+cp /usr/local/lib/pkgconfig/opus.pc /usr/lib64/pkgconfig
+cd ..
+'''  </p>
+<h3>编译libpng</h3>
+<p>'''sh 
+git clone https://freeswitch.org/stash/scm/sd/libpng.git
+cd libpng
+ ./configure
+make
+make install
+cp /usr/local/lib/pkgconfig/libpng* /usr/lib64/pkgconfig/
+pkg-config --list-all | grep png
+cd ..
+'''  </p>
+<h3>编译&amp;安装</h3>
+<p>'''sh 
+./bootstrap.sh -j
+./configure -C
+make
+make install
+'''  </p>
+<h3>Install CD-Quality Sounds</h3>
+<p>'''sh 
+make cd-sounds-install
+make cd-moh-install
+'''  </p>
+<h3>Set Owner and Permissions</h3>
+<p>'''sh
+#create user 'freeswitch'
+#add it to group 'daemon'
+#change owner and group of the freeswitch installation
+cd /usr/local
+useradd --system --home-dir /usr/local/freeswitch -G daemon freeswitch
+passwd -l freeswitch</p>
+<p>chown -R freeswitch:daemon /usr/local/freeswitch/ 
+chmod -R 770 /usr/local/freeswitch/
+chmod -R 750 /usr/local/freeswitch/bin/*</p>
+<p>mkdir /var/run/freeswitch
+chown -R freeswitch:daemon  /var/run/freeswitch</p>
+<p>ln -s /usr/local/freeswitch/bin/freeswitch /usr/bin/ # needed by /etc/init.d/freeswitch
+'''</p>
+<h3>设置LD_LIBRARY_PATH</h3>
+<p>编辑文件<br />
+'''sh 
+vi ~/.bash_profile
+# add libyuv.so path
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib
+'''  </p>
+<p>让配置生效
+'''sh 
+source ~/.bash_profile
+'''</p>
+<h3>启动</h3>
+<p>'''sh 
+cd /usr/local/freeswitch/bin
+./freeswitch
+'''</p>
+<p>参考资料：<br />
+https://freeswitch.org/confluence/display/FREESWITCH/CentOS+6?focusedCommentId=7766400#comment-7766400<br />
+http://www.8000hz.com/archives/freeswitch-git-compile-1-7.html<br />
+http://www.cnblogs.com/hezhixiong/p/4797511.html</p>
+<p>依赖包：<br />
+http://files.freeswitch.org/downloads/libs/</p>
+<p>安装过程中出现问题：
+在centos 6.6的x86 32位机器上安装到最后的freeswitch make，出现下述问题：
+make的时候报错：
+make[2]: Entering directory <code>/root/freeswitch.git'
+  CCLD   freeswitch
+/usr/lib//libyuv.so: undefined reference to</code>ScaleARGBRowDown2_SSE2'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown4_SSE2' </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDown2Box_SSE2'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown2Box_SSE2'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDownEvenBox_SSE2'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown34_0_Box_SSSE3'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown38_SSSE3'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDownEven_SSE2'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown38_3_Box_SSSE3'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown2_SSE2'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown34_1_Box_SSSE3'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown34_SSSE3'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown38_2_Box_SSSE3'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown4Box_SSE2'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleRowDown2Linear_SSE2'  </p>
+<p>/usr/lib//libyuv.so: undefined reference to `ScaleARGBRowDown2Linear_SSE2'  </p>
+<p>libyuv.so中找不到函数定义或没有找到libyuv.so，而在/usr/lib中是能够找到，并且freeswitch的makefile中也引用了"-L/usr/lib -lyuv"，然后最后没有解决该问题，后面改为在64位上编译就可以（应该与32位或64位关系不大，有可能是32位下的某个操作导致了错误）；</p>
+<p><strong>版权声明：本文为博主原创文章，未经博主允许不得转载。</strong></p>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://blog.chinaunix.net/uid/20681545.html">ChinaUnix</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://dillinger.io/">dillinger</a></li>
+                            <li><a href="http://www.jobbole.com/">jobbole</a></li>
+                            <li><a href="http://linux.chinaunix.net/">linux时代</a></li>
+                            <li><a href="http://pelican-docs-zh-cn.readthedocs.org/en/latest/getting_started.html">pelican快速入门</a></li>
+                            <li><a href="http://sspai.com/">少数派</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

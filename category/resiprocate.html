@@ -14,6 +14,8 @@
         <header id="banner" class="body">
                 <h1><a href="http://ybu2008.github.io/">Zbaihong's Blog </a></h1>
                 <nav><ul>
+                    <li><a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a></li>
+                    <li><a href="http://ybu2008.github.io/category/linux.html">linux</a></li>
                     <li><a href="http://ybu2008.github.io/category/python.html">Python</a></li>
                     <li class="active"><a href="http://ybu2008.github.io/category/resiprocate.html">ReSIProcate</a></li>
                 </ul></nav>
@@ -21,7 +23,7 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="http://ybu2008.github.io/ReSIProcate dum example BasicCall.html">ReSIProcate dum example asicCall</a></h1>
+                    <h1 class="entry-title"><a href="http://ybu2008.github.io/ReSIProcate dum example BasicCall.html">ReSIProcate dum example BasicCall</a></h1>
 <footer class="post-info">
         <abbr class="published" title="2016-01-18T18:52:22+01:00">
                 Published: Mon 18 January 2016
@@ -89,12 +91,12 @@ clean:
 dum、handler、profile、nameaddr等的初始化操作及关联建立；
 各个handler里面的回调接口；
 </font></p>
-<p>一个uas的大致步骤如下：
-<em> 实现一个继承自AppDialog的类MyAppDialog，该类可以带上业务所需的数据；
-</em> 实现一个继承自AppDialogSet的类MyAppDialogSet，用于创建MyAppDialog；
-<em> 实现一个继承自AppDialogSetFactory的类MyAppDialogSetFactory，用于创建MyAppDialogSet；
-</em> 实现一个继承自一个或多个Handler的类MyHandler，在该Handler中完成信令的回调接口；
-* 实现一个UAS或UAC，继承自MyHandler，同时封装应用业务；</p>
+<p>一个uas的大致步骤如下：<br />
+<em> 实现一个继承自AppDialog的类MyAppDialog，该类可以带上业务所需的数据；<br />
+</em> 实现一个继承自AppDialogSet的类MyAppDialogSet，用于创建MyAppDialog；<br />
+<em> 实现一个继承自AppDialogSetFactory的类MyAppDialogSetFactory，用于创建MyAppDialogSet；<br />
+</em> 实现一个继承自一个或多个Handler的类MyHandler，在该Handler中完成信令的回调接口；<br />
+* 实现一个UAS或UAC，继承自MyHandler，同时封装应用业务；  </p>
 <p>绑定关系：<br />
 uas的uri（作为from tag）;<br />
 sipstack；<br />
@@ -263,7 +265,10 @@ uas的内容与上述过程一样；<br />
    <span class="c1">// OK to delete DUM objects now</span>
    <span class="n">delete</span> <span class="n">dumUac</span><span class="p">;</span> 
    <span class="n">delete</span> <span class="n">dumUas</span><span class="p">;</span>
-</pre></div>                </article>
+</pre></div>
+
+
+<p><strong>版权声明：本文为博主原创文章，未经博主允许不得转载。</strong></p>                </article>
             </aside><!-- /#featured -->
         <section id="extras" class="body">
                 <div class="blogroll">
