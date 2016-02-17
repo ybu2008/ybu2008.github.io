@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>Zbaihong's Blog - freeswitch</title>
+        <title>Zbaihong's Blog - c</title>
         <link rel="stylesheet" href="http://ybu2008.github.io/theme/css/main.css" />
 
         <!--[if IE]>
@@ -25,31 +25,25 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="http://ybu2008.github.io/Use Freeswitch As Call Back Server.html">Use Freeswitch As Call Back Server</a></h1>
+                    <h1 class="entry-title"><a href="http://ybu2008.github.io/multiple definition of variable first defined here.html">multiple definition of variable first defined here</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2016-02-01T15:52:22+01:00">
-                Published: Mon 01 February 2016
+        <abbr class="published" title="2016-02-17T09:52:22+01:00">
+                Published: Wed 17 February 2016
         </abbr>
 
         <address class="vcard author">
                 By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
         </address>
-<p>In <a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a>.</p>
-<p>tags: <a href="http://ybu2008.github.io/tag/freeswitch.html">freeswitch</a> <a href="http://ybu2008.github.io/tag/back-call.html">Back Call</a> <a href="http://ybu2008.github.io/tag/originate.html">originate</a> </p>
-</footer><!-- /.post-info --><h3>使用freeswitch实现回拨功能</h3>
-<p>部署如下，T1和T2为两台支持sip呼叫的中继，A注册在T1，B注册在T2：<br />
-A--T1----freeswitch-----T2--B  </p>
-<p>freeswitch作为B2BUA，分别呼叫A、B，A和B分别摘机后，A和B建立通话，媒体rtp经过freeswitch，freeswitch做媒体桥接；  </p>
-<p>使用freeswitch的api和app实现，命令如下： </p>
-<div class="highlight"><pre>originate sofia/external/A@T1:5060 &amp;bridge(sofia/external/B@T2:5060)
-</pre></div>
-
-
-<p>在实验阶段，A振铃并应答，但B信令发到T2，T2回了183 sdp后没有响应了，经过抓包发现183sdp是T2自动发出的，同时该invite所带的sdp中，g722编码优先排第一，猜测有可能T2不支持该编码导致；  </p>
-<p>修改freeswitch的vars.xml中编码优先级，去掉G722等不支持的编码或移到后面；修改后内容如下：</p>
-<div class="highlight"><pre>&lt;X-PRE-PROCESS cmd=&quot;set&quot; data=&quot;global_codec_prefs=PCMU,PCMA,G729&quot;/&gt;
-&lt;X-PRE-PROCESS cmd=&quot;set&quot; data=&quot;outbound_codec_prefs=PCMU,PCMA,G729&quot;/&gt;
-</pre></div>                </article>
+<p>In <a href="http://ybu2008.github.io/category/cc.html">C&&C++</a>.</p>
+<p>tags: <a href="http://ybu2008.github.io/tag/c.html">c</a> <a href="http://ybu2008.github.io/tag/c.html">c++</a> <a href="http://ybu2008.github.io/tag/multiple-definition.html">multiple definition</a> </p>
+</footer><!-- /.post-info --><h1>multiple definition of `variable' first defined here</h1>
+<p>头文件global.h中是这样定义的<br />
+int variable;</p>
+<p>导致在多个cpp文件include "global.h"时，出现多处定义；因为编译器的工作是把include头文件的内容现展开到cpp源文件中，这导致在多个cpp文件中出现重复定义，该文件在编译时不报错，但在link阶段出现。  </p>
+<p>在global.h中改为static int variable，虽然link成功但会导致逻辑错误，原因还是上述的编译原理，每个文件包含static int variable，但由于是static，每个文件中的variable不是同一个，各自单独的内存空间。   </p>
+<p>应该采用<br />
+extern int variable
+至于定义，则放在合适的cpp文件中int variable。</p>                </article>
             </aside><!-- /#featured -->
                 <section id="content" class="body">
                     <h1>Other articles</h1>
@@ -58,23 +52,23 @@ A--T1----freeswitch-----T2--B  </p>
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="http://ybu2008.github.io/Expriment B2BUA Recording By Freeswitch.html" rel="bookmark"
-                           title="Permalink to Expriment:B2BUA && Recording By Freeswitch">Expriment:B2BUA && Recording By Freeswitch</a></h1>
+                    <h1><a href="http://ybu2008.github.io/multiple definition of variable first defined here.html" rel="bookmark"
+                           title="Permalink to multiple definition of variable first defined here">multiple definition of variable first defined here</a></h1>
                 </header>
 
                 <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2016-01-22T15:52:22+01:00">
-                Published: Fri 22 January 2016
+        <abbr class="published" title="2016-02-17T09:52:22+01:00">
+                Published: Wed 17 February 2016
         </abbr>
 
         <address class="vcard author">
                 By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
         </address>
-<p>In <a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a>.</p>
-<p>tags: <a href="http://ybu2008.github.io/tag/freeswitch.html">freeswitch</a> <a href="http://ybu2008.github.io/tag/b2bua.html">B2BUA</a> <a href="http://ybu2008.github.io/tag/recording.html">Recording</a> </p>
-</footer><!-- /.post-info -->                
-                <a class="readmore" href="http://ybu2008.github.io/Expriment B2BUA Recording By Freeswitch.html">read more</a>
+<p>In <a href="http://ybu2008.github.io/category/cc.html">C&&C++</a>.</p>
+<p>tags: <a href="http://ybu2008.github.io/tag/c.html">c</a> <a href="http://ybu2008.github.io/tag/c.html">c++</a> <a href="http://ybu2008.github.io/tag/multiple-definition.html">multiple definition</a> </p>
+</footer><!-- /.post-info -->                <p>multiple definition of variable first defined here</p>
+                <a class="readmore" href="http://ybu2008.github.io/multiple definition of variable first defined here.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
                 </ol><!-- /#posts-list -->

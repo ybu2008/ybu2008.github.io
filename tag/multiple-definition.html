@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>yum:Failed to set locale, defaulting to C</title>
+        <title>Zbaihong's Blog - multiple definition</title>
         <link rel="stylesheet" href="http://ybu2008.github.io/theme/css/main.css" />
 
         <!--[if IE]>
@@ -16,54 +16,35 @@
                 <nav><ul>
                     <li><a href="http://ybu2008.github.io/category/cc.html">C&&C++</a></li>
                     <li><a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a></li>
-                    <li class="active"><a href="http://ybu2008.github.io/category/linux.html">linux</a></li>
+                    <li><a href="http://ybu2008.github.io/category/linux.html">linux</a></li>
                     <li><a href="http://ybu2008.github.io/category/network-program.html">network program</a></li>
                     <li><a href="http://ybu2008.github.io/category/python.html">Python</a></li>
                     <li><a href="http://ybu2008.github.io/category/resiprocate.html">ReSIProcate</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
-<section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="http://ybu2008.github.io/Failed to set locale, defaulting to C.html" rel="bookmark"
-           title="Permalink to yum:Failed to set locale, defaulting to C">yum:Failed to set locale, defaulting to C</a></h1>
-    </header>
 
-    <div class="entry-content">
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="http://ybu2008.github.io/multiple definition of variable first defined here.html">multiple definition of variable first defined here</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2016-01-21T17:41:22+01:00">
-                Published: Thu 21 January 2016
+        <abbr class="published" title="2016-02-17T09:52:22+01:00">
+                Published: Wed 17 February 2016
         </abbr>
 
         <address class="vcard author">
                 By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
         </address>
-<p>In <a href="http://ybu2008.github.io/category/linux.html">linux</a>.</p>
-<p>tags: <a href="http://ybu2008.github.io/tag/yum-locale.html">yum locale</a> </p>
-</footer><!-- /.post-info -->      <ul>
-<li>环境：centos 6.6 x86_64  </li>
-<li>描述：yum使用时报Failed to set locale, defaulting to C，执行locale命令(设置语言环境)：  </li>
-</ul>
-<div class="highlight"><pre>01.locale：Cannot <span class="nb">set </span>LC_CTYPE to default locale： No such file or directory
-02.locale：Cannot <span class="nb">set </span>LC_MESSAGES to default locale： No such file or directory
-03.locale：Cannot <span class="nb">set </span>LC_ALL to default locale： No such file or directory 
-</pre></div>
-
-
-<ul>
-<li>解决：  </li>
-</ul>
-<div class="highlight"><pre><span class="nb">echo</span> <span class="s2">&quot;export LC_ALL=en_US.UTF-8&quot;</span>  &gt;&gt;  /etc/profile
-<span class="nb">source</span> /etc/profile
-</pre></div>
-
-
-<p><strong>版权声明：本文为博主原创文章，未经博主允许不得转载。</strong></p>
-    </div><!-- /.entry-content -->
-
-  </article>
-</section>
+<p>In <a href="http://ybu2008.github.io/category/cc.html">C&&C++</a>.</p>
+<p>tags: <a href="http://ybu2008.github.io/tag/c.html">c</a> <a href="http://ybu2008.github.io/tag/c.html">c++</a> <a href="http://ybu2008.github.io/tag/multiple-definition.html">multiple definition</a> </p>
+</footer><!-- /.post-info --><h1>multiple definition of `variable' first defined here</h1>
+<p>头文件global.h中是这样定义的<br />
+int variable;</p>
+<p>导致在多个cpp文件include "global.h"时，出现多处定义；因为编译器的工作是把include头文件的内容现展开到cpp源文件中，这导致在多个cpp文件中出现重复定义，该文件在编译时不报错，但在link阶段出现。  </p>
+<p>在global.h中改为static int variable，虽然link成功但会导致逻辑错误，原因还是上述的编译原理，每个文件包含static int variable，但由于是static，每个文件中的variable不是同一个，各自单独的内存空间。   </p>
+<p>应该采用<br />
+extern int variable
+至于定义，则放在合适的cpp文件中int variable。</p>                </article>
+            </aside><!-- /#featured -->
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>

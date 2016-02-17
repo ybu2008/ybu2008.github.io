@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>yum:Failed to set locale, defaulting to C</title>
+        <title>socket with Block mode that cause epoll_wait not return other noblock event</title>
         <link rel="stylesheet" href="http://ybu2008.github.io/theme/css/main.css" />
 
         <!--[if IE]>
@@ -16,8 +16,8 @@
                 <nav><ul>
                     <li><a href="http://ybu2008.github.io/category/cc.html">C&&C++</a></li>
                     <li><a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a></li>
-                    <li class="active"><a href="http://ybu2008.github.io/category/linux.html">linux</a></li>
-                    <li><a href="http://ybu2008.github.io/category/network-program.html">network program</a></li>
+                    <li><a href="http://ybu2008.github.io/category/linux.html">linux</a></li>
+                    <li class="active"><a href="http://ybu2008.github.io/category/network-program.html">network program</a></li>
                     <li><a href="http://ybu2008.github.io/category/python.html">Python</a></li>
                     <li><a href="http://ybu2008.github.io/category/resiprocate.html">ReSIProcate</a></li>
                 </ul></nav>
@@ -26,40 +26,26 @@
   <article>
     <header>
       <h1 class="entry-title">
-        <a href="http://ybu2008.github.io/Failed to set locale, defaulting to C.html" rel="bookmark"
-           title="Permalink to yum:Failed to set locale, defaulting to C">yum:Failed to set locale, defaulting to C</a></h1>
+        <a href="http://ybu2008.github.io/socket with Block mode that cause epoll_wait not return other noblock event.html" rel="bookmark"
+           title="Permalink to socket with Block mode that cause epoll_wait not return other noblock event">socket with Block mode that cause epoll_wait not return other noblock event</a></h1>
     </header>
 
     <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2016-01-21T17:41:22+01:00">
-                Published: Thu 21 January 2016
+        <abbr class="published" title="2016-02-17T17:41:22+01:00">
+                Published: Wed 17 February 2016
         </abbr>
 
         <address class="vcard author">
                 By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
         </address>
-<p>In <a href="http://ybu2008.github.io/category/linux.html">linux</a>.</p>
-<p>tags: <a href="http://ybu2008.github.io/tag/yum-locale.html">yum locale</a> </p>
-</footer><!-- /.post-info -->      <ul>
-<li>环境：centos 6.6 x86_64  </li>
-<li>描述：yum使用时报Failed to set locale, defaulting to C，执行locale命令(设置语言环境)：  </li>
-</ul>
-<div class="highlight"><pre>01.locale：Cannot <span class="nb">set </span>LC_CTYPE to default locale： No such file or directory
-02.locale：Cannot <span class="nb">set </span>LC_MESSAGES to default locale： No such file or directory
-03.locale：Cannot <span class="nb">set </span>LC_ALL to default locale： No such file or directory 
+<p>In <a href="http://ybu2008.github.io/category/network-program.html">network program</a>.</p>
+<p>tags: <a href="http://ybu2008.github.io/tag/centos-freeswitch.html">centos freeswitch</a> </p>
+</footer><!-- /.post-info -->      <p>今天在使用自己编写的epoll服务器时犯了个错误，client链接的socket1放到epoll后，监听的socket2发生事件后，epoll_wait不会返回，只有等client关闭后，epoll_wait才返回socket2的事件。  </p>
+<p>后面跟踪发现是socket1没有设置为非阻塞，导致epoll_wait等待socket1的消息，即使socket2已经设置了非阻塞。
+设置非阻塞方法：  </p>
+<div class="highlight"><pre>fcntl(fd, F_SETFL, O_NONBLOCK)
 </pre></div>
-
-
-<ul>
-<li>解决：  </li>
-</ul>
-<div class="highlight"><pre><span class="nb">echo</span> <span class="s2">&quot;export LC_ALL=en_US.UTF-8&quot;</span>  &gt;&gt;  /etc/profile
-<span class="nb">source</span> /etc/profile
-</pre></div>
-
-
-<p><strong>版权声明：本文为博主原创文章，未经博主允许不得转载。</strong></p>
     </div><!-- /.entry-content -->
 
   </article>

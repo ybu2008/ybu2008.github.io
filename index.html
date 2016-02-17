@@ -14,8 +14,10 @@
         <header id="banner" class="body">
                 <h1><a href="http://ybu2008.github.io/">Zbaihong's Blog </a></h1>
                 <nav><ul>
+                    <li><a href="http://ybu2008.github.io/category/cc.html">C&&C++</a></li>
                     <li><a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a></li>
                     <li><a href="http://ybu2008.github.io/category/linux.html">linux</a></li>
+                    <li><a href="http://ybu2008.github.io/category/network-program.html">network program</a></li>
                     <li><a href="http://ybu2008.github.io/category/python.html">Python</a></li>
                     <li><a href="http://ybu2008.github.io/category/resiprocate.html">ReSIProcate</a></li>
                 </ul></nav>
@@ -23,7 +25,57 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="http://ybu2008.github.io/Use Freeswitch As Back Call Server.html">Use Freeswitch As Back Call Server</a></h1>
+                    <h1 class="entry-title"><a href="http://ybu2008.github.io/socket with Block mode that cause epoll_wait not return other noblock event.html">socket with Block mode that cause epoll_wait not return other noblock event</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-02-17T17:41:22+01:00">
+                Published: Wed 17 February 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
+        </address>
+<p>In <a href="http://ybu2008.github.io/category/network-program.html">network program</a>.</p>
+<p>tags: <a href="http://ybu2008.github.io/tag/centos-freeswitch.html">centos freeswitch</a> </p>
+</footer><!-- /.post-info --><p>今天在使用自己编写的epoll服务器时犯了个错误，client链接的socket1放到epoll后，监听的socket2发生事件后，epoll_wait不会返回，只有等client关闭后，epoll_wait才返回socket2的事件。  </p>
+<p>后面跟踪发现是socket1没有设置为非阻塞，导致epoll_wait等待socket1的消息，即使socket2已经设置了非阻塞。
+设置非阻塞方法：  </p>
+<div class="highlight"><pre>fcntl(fd, F_SETFL, O_NONBLOCK)
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="http://ybu2008.github.io/multiple definition of variable first defined here.html" rel="bookmark"
+                           title="Permalink to multiple definition of variable first defined here">multiple definition of variable first defined here</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-02-17T09:52:22+01:00">
+                Published: Wed 17 February 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
+        </address>
+<p>In <a href="http://ybu2008.github.io/category/cc.html">C&&C++</a>.</p>
+<p>tags: <a href="http://ybu2008.github.io/tag/c.html">c</a> <a href="http://ybu2008.github.io/tag/c.html">c++</a> <a href="http://ybu2008.github.io/tag/multiple-definition.html">multiple definition</a> </p>
+</footer><!-- /.post-info -->                <p>multiple definition of variable first defined here</p>
+                <a class="readmore" href="http://ybu2008.github.io/multiple definition of variable first defined here.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="http://ybu2008.github.io/Use Freeswitch As Call Back Server.html" rel="bookmark"
+                           title="Permalink to Use Freeswitch As Call Back Server">Use Freeswitch As Call Back Server</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-02-01T15:52:22+01:00">
                 Published: Mon 01 February 2016
@@ -34,25 +86,10 @@
         </address>
 <p>In <a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a>.</p>
 <p>tags: <a href="http://ybu2008.github.io/tag/freeswitch.html">freeswitch</a> <a href="http://ybu2008.github.io/tag/back-call.html">Back Call</a> <a href="http://ybu2008.github.io/tag/originate.html">originate</a> </p>
-</footer><!-- /.post-info --><h3>使用freeswitch实现回拨功能</h3>
-<p>部署如下，T1和T2为两台支持sip呼叫的中继，A注册在T1，B注册在T2：<br />
-A--T1----freeswitch-----T2--B  </p>
-<p>freeswitch作为B2BUA，分别呼叫A、B，A和B分别摘机后，A和B建立通话，媒体rtp经过freeswitch，freeswitch做媒体桥接；  </p>
-<p>使用freeswitch的api和app实现，命令如下： </p>
-<div class="highlight"><pre>originate sofia/external/A@T1:5060 &amp;bridge(sofia/external/B@T2:5060)
-</pre></div>
-
-
-<p>在实验阶段，A振铃并应答，但B信令发到T2，T2回了183 sdp后没有响应了，经过抓包发现183sdp是T2自动发出的，同时该invite所带的sdp中，g722编码优先排第一，猜测有可能T2不支持该编码导致；  </p>
-<p>修改freeswitch的vars.xml中编码优先级，去掉G722等不支持的编码或移到后面；修改后内容如下：</p>
-<div class="highlight"><pre>&lt;X-PRE-PROCESS cmd=&quot;set&quot; data=&quot;global_codec_prefs=PCMU,PCMA,G729&quot;/&gt;
-&lt;X-PRE-PROCESS cmd=&quot;set&quot; data=&quot;outbound_codec_prefs=PCMU,PCMA,G729&quot;/&gt;
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Use Freeswitch As Call Back Server</p>
+                <a class="readmore" href="http://ybu2008.github.io/Use Freeswitch As Call Back Server.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -100,8 +137,30 @@ A--T1----freeswitch-----T2--B  </p>
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="http://ybu2008.github.io/Linux共享对象之编译参数fPIC.html" rel="bookmark"
-                           title="Permalink to [转]Linux共享对象之编译参数fPIC">[转]Linux共享对象之编译参数fPIC</a></h1>
+                    <h1><a href="http://ybu2008.github.io/centos 6.6 x86_64 freeswitch 1.7 install.html" rel="bookmark"
+                           title="Permalink to centos 6.6 x86_64 freeswitch 1.7 install">centos 6.6 x86_64 freeswitch 1.7 install</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-01-21T17:41:22+01:00">
+                Published: Thu 21 January 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
+        </address>
+<p>In <a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a>.</p>
+<p>tags: <a href="http://ybu2008.github.io/tag/centos-freeswitch.html">centos freeswitch</a> </p>
+</footer><!-- /.post-info -->                <p>centos 6.6 x86_64 freeswitch 1.7 install</p>
+                <a class="readmore" href="http://ybu2008.github.io/centos 6.6 x86_64 freeswitch 1.7 install.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="http://ybu2008.github.io/fPIC for shared object.html" rel="bookmark"
+                           title="Permalink to fPIC for shared object">fPIC for shared object</a></h1>
                 </header>
 
                 <div class="entry-content">
@@ -116,29 +175,7 @@ A--T1----freeswitch-----T2--B  </p>
 <p>In <a href="http://ybu2008.github.io/category/linux.html">linux</a>.</p>
 <p>tags: <a href="http://ybu2008.github.io/tag/linux-fpic-so.html">linux fpic so</a> </p>
 </footer><!-- /.post-info -->                <p>Linux共享对象之编译参数fPIC</p>
-                <a class="readmore" href="http://ybu2008.github.io/Linux共享对象之编译参数fPIC.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="http://ybu2008.github.io/centos 6.6 x86_64 freeswitch 1.7版本安装.html" rel="bookmark"
-                           title="Permalink to centos 6.6 x86_64 freeswitch 1.7版本安装">centos 6.6 x86_64 freeswitch 1.7版本安装</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-01-21T17:41:22+01:00">
-                Published: Thu 21 January 2016
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
-        </address>
-<p>In <a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a>.</p>
-<p>tags: <a href="http://ybu2008.github.io/tag/centos-freeswitch.html">centos freeswitch</a> </p>
-</footer><!-- /.post-info -->                <p>centos 6.6 x86_64 freeswitch 1.7版本安装</p>
-                <a class="readmore" href="http://ybu2008.github.io/centos 6.6 x86_64 freeswitch 1.7版本安装.html">read more</a>
+                <a class="readmore" href="http://ybu2008.github.io/fPIC for shared object.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
