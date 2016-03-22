@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Zbaihong's Blog - SaltStack Installed</title>
+        <link rel="stylesheet" href="http://ybu2008.github.io/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://ybu2008.github.io/">Zbaihong's Blog </a></h1>
+                <nav><ul>
+                    <li><a href="http://ybu2008.github.io/category/cc.html">C&&C++</a></li>
+                    <li><a href="http://ybu2008.github.io/category/freeswitch.html">freeswitch</a></li>
+                    <li><a href="http://ybu2008.github.io/category/linux.html">linux</a></li>
+                    <li><a href="http://ybu2008.github.io/category/network-program.html">network program</a></li>
+                    <li><a href="http://ybu2008.github.io/category/project.html">Project</a></li>
+                    <li><a href="http://ybu2008.github.io/category/python.html">Python</a></li>
+                    <li><a href="http://ybu2008.github.io/category/resiprocate.html">ReSIProcate</a></li>
+                    <li><a href="http://ybu2008.github.io/category/saltstack.html">SaltStack</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="http://ybu2008.github.io/SaltStack Installed.html">SaltStack Installed</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-03-22T09:41:22+01:00">
+                Published: Tue 22 March 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="http://ybu2008.github.io/author/zbaihong.html">Zbaihong</a>
+        </address>
+<p>In <a href="http://ybu2008.github.io/category/saltstack.html">SaltStack</a>.</p>
+<p>tags: <a href="http://ybu2008.github.io/tag/saltstack-installed.html">SaltStack Installed</a> </p>
+</footer><!-- /.post-info --><p>安装saltstack并实践
+下述内容转自：<a href="http://www.iyunv.com/thread-184698-1-1.html">http://www.iyunv.com/thread-184698-1-1.html</a><br />
+"PS:"部分为个人注释；</p>
+<h3>安装：</h3>
+<div class="highlight"><pre>rpm -Uvh http://mirror.pnl.gov/epel/6/x86_64/epel-release-6-8.noarch.rpm
+</pre></div>
+
+
+<p>最新的似乎是2015.8.1，如果用pip安装的话。  </p>
+<p>master安装  </p>
+<div class="highlight"><pre>yum install salt-master -y  
+chkconfig salt-master on  
+sed -i &quot;s/# interface: 0.0.0.0/  interface: MasterIP地址/&quot; /etc/salt/master  ###绑定master端IP地址  
+service salt-master start   ###启动salt-master
+</pre></div>
+
+
+<p>Minion安装</p>
+<div class="highlight"><pre>yum install salt-minion –y
+chkconfig salt-minion on
+sed -i &quot;s/#master: salt/  master: MasterIP地址/&quot; /etc/salt/minion                   ###传入Master端IP地址
+service salt-minion start  ###启动salt-minion
+</pre></div>
+
+
+<p>如果开启防火墙的话，需要配置防火墙，参考https://docs.saltstack.com/en/la ... ewall.html#iptables  </p>
+<div class="highlight"><pre># Allow Minions from these networks
+-I INPUT -s 10.1.2.0/24 -p tcp -m multiport --dports 4505,4506 -j ACCEPT
+-I INPUT -s 10.1.3.0/24 -p tcp -m multiport --dports 4505,4506 -j ACCEPT
+# Allow Salt to communicate with Master on the loopback interface
+-A INPUT -i lo -p tcp -m multiport --dports 4505,4506 -j ACCEPT
+# Reject everything else
+-A INPUT -p tcp -m multiport --dports 4505,4506 -j REJECT
+</pre></div>
+
+
+<p><em>ps:单独安装salt-minion，某些包会下载不成功，先按master再按minion就没有提示；</em></p>
+<p>在master，minion分别启动后会minion端会到master这里申请认证<br />
+master执行：  </p>
+<div class="highlight"><pre>salt-key –L   ##列出所有认证的客户端
+Accepted Keys:（已经接受的）
+minion-id-1
+Denied Keys:(未被允许的)
+Unaccepted Keys:(未接受的)
+minion-id-2
+Rejected Keys:(拒绝的)
+# salt-key –A   ##接受所有
+</pre></div>
+
+
+<p><em>每个minion客户端的都有一个minion_id，即上面的minion-id-1、minion-id-2就是客户端的minion_id 默认是取得客户端的主机名，而minion-id是不能重复的！！！</em><br />
+注：如需更改需要在客户端修改/etc/salt/minion_id配置文件,此文件只有在salt-minion启动后才会生成  </p>
+<p>Salt-key常用命令  .</p>
+<div class="highlight"><pre>salt-key –a   接受某个客户端请求  
+salt-key –A   接受所有客户端请求  
+salt-key –d   删除单个客户端  
+salt-key –D   删除所有客户端
+</pre></div>
+
+
+<p>注：删除之后，如需重新认证，重启客户端即可</p>
+<h3>Salt配置文件</h3>
+<p>两个重要的配置参数是file_roots(定义环境的目录)，nodegroups（定义组）,主要配置文件在/etc/salt/master(master端)和/etc/salt/minion（minion端）</p>
+<p>注：master端配置文件默认是会加载所有/etc/salt/master.d/（此目录默认不存在，需自己创建）目录下的所有以.conf结尾的配 置文件，为了更易阅读，我将所有的自定义参数每个单一的创建一个配置文件，如环境变量，可以分别设置生产，测试，开发环境，在往下分就是主机的应用级别分 类，根据具体环境，具体设置。  </p>
+<div class="highlight"><pre>/etc/salt/master.d/env.conf
+file_roots:
+  base:
+    - /data/salt/base
+    - /data/salt/base/sls
+  apache:
+    - /data/salt/apache
+    - /data/salt/apache/confsls
+  nginx:
+    - /data/salt/tomcat
+    - /data/salt/nginx/confsls
+  mysql:
+    - /data/salt/mysql
+</pre></div>
+
+
+<p>如上述配置所述，一共定义了四个个环境，分别是base，apache，nginx，mysql等，环境变量的作用在下面会说到，主要是配合sls文件使用
+不同环境的sls配置文件的目录分别放在对应的目录，比如base环境的sls文件，既可以放在/data/salt/base 也可以放在/data/salt/base/sls，其中sls文件是什么会在后面说到，接下来配置所有minion的分组信息，按照用途或者不同ip等分类信息分别定义组名  </p>
+<div class="highlight"><pre>/etc/salt/master.d/groups.conf
+nodegroups:
+  redis: &#39;redis*&#39;
+  mysql: &#39;mysql*&#39;
+  apache: &#39;tomcat* not apache-[1][3-4]&#39;
+  nottom: &#39;* not tomcat*&#39;
+</pre></div>
+
+
+<p><em>PS：key：value模式时，冒号与value之间有一个空格；</em></p>
+<p>如上所述上面一共定义了四个组。<br />
+注：注意上面的格式，salt几乎所有的配置文件遵循两个空格为一个递进的方式（即file_root下面空两个的都是它的参数，二它参数下面空两格的又是它参数的参数，后面写配置文件会更全面的介绍），而且不能用tab键补全!!!</p>
+<h3>Salt常用命令：</h3>
+<p>Salt语法  </p>
+<div class="highlight"><pre>salt  [客户端id，即目标]  [模块名，如state，cmd。其实都是salt的模块]  [动作]
+</pre></div>
+
+
+<p>接触saltstack的第一个salt命令一定是test.ping，主要用于探测客户端的存活状态</p>
+<p>注：常用的两个模块主要是state,cmd两个模块，分别对应的功能就是state（状态，在后面会详细叙述，什么是状态），以及cmd（远程执行，而用到此模块的方法一般就是cmd.run）  </p>
+<p>首先介绍target，目标，或者说客户端id的匹配方式  </p>
+<div class="highlight"><pre>[iyunv@master~]# salt \* test.ping
+minion-1:
+    True
+minion-2:
+    True
+minion-3:
+    True
+minion-4:
+    True
+</pre></div>
+
+
+<p>True代表正常，没有响应当然代表客户端没有启动或者没有认证成功之类的。  </p>
+<p>指定目标主要有五种方式<br />
+1.： Global，即salt默认的匹配方式，能识别终端常用的通配符，如<em>代表所有，如，salt '</em>' test.ping</p>
+<p>2.： List，列表，需-L指定。如：<br />
+salt  -L 'foo,bar' test.ping 其中foo,bar是完整的minion_id</p>
+<p>3.：正则表达式，需-E指定。如：<br />
+salt  -E 'pre[1-7]' test.ping 会匹配pre1，pre2..pre7，并且匹配到左右minion_id里面含有1-7的，如pre-11,pre7也会匹配到，如果只匹配1-7可使用参照下面，如：<br />
+salt  -E ^pre[1-7]$ test.ping或者 salt  pre[1-7] test.ping</p>
+<p>4.：混合模式，需-C指定。里面可以既有正则表达式也有列表等
+salt -C "apache<em> or E@ngin</em>" test.ping 匹配所有tomcat开头，或者mon开头的</p>
+<p>5.：分组，需要-N指定，其中组名就是上面/etc/salt/master.d/groups.conf文件里面配置的配置信息。
+如，salt -N apache test.ping</p>
+<p>然后是模块，主要介绍state，cmd，cp模块
+注：想了解某个模块的功能或者具体参数可以  </p>
+<div class="highlight"><pre>salt \* sys.doc [模块名，如cmd]
+</pre></div>
+
+
+<p>即salt * sys.doc cmd  就会列出相关操作及示例了</p>
+<h3>远程命令执行</h3>
+<p>远程命令执行大概是最常用的操作的，比如获取所有minion端的ip地址，查看同一个目录下的文件，全部增加一条环境变量到/etc/profile文件里并刷新环境变量等等操作</p>
+<h3>cmd模块</h3>
+<p>主要用此模块的run方法，即cmd.run <br />
+使用方式如下：  </p>
+<div class="highlight"><pre>salt \* cmd.run &#39;ls /root&#39;
+</pre></div>
+
+
+<p>如上所示，选择了所有的客户端，master端用cmd.run模块，把''里面的'ls /root'命令全部分发下去，其中单引号''也可以用双引号""代替，引号的作用就是把被引号的命令传给salt-master，然后master分发 给所有的minion执行，上述命令就会列出所有minion端/root目录下的文件</p>
+<p>注：引号里面的命令跟在任何一台机器上的命令没有任何区别，唯一的区别就是salt执行的命令默认用的是sh，而我们常用的shell是bash，比如 bash中ll是ls –l的别名，而sh里面是没有做ll的别名的，所以引号里面的命令如果用ll命令会提示找不到此命令的</p>
+<p>cmd有几个有用的参数，在可以着重介绍一下
+cwd 定义命令所在的目录，即工作目录，在哪个目录执行操作
+如：  </p>
+<div class="highlight"><pre>Salt \* cmd.run cwd=/opt ‘pwd’
+minion-id-1：
+   /opt
+</pre></div>
+
+
+<p>runas，定义执行此条命令的用户，使用哪个用户执行这条命令，如：<br />
+Salt * cmd.run runas=nobody ‘touch /tmp/file’
+然后去客户端就会发现，在/tmp/目录下有一个file文件，拥有者是nobody</p>
+<h3>state模块</h3>
+<p>主要用到的几个方法是sls,highstate,show_sls，在讲state模块的时候首先得了解sls文件。
+Sls文件用.sls结尾，放在指定的环境目录下，即提到的/data/salt/base、/data/salt/base/sls或者/data/salt/apache/sls等目录
+注：假如在这两个目录下有两个一样的sls文件，那么会file_root配置的第一个环境目录，即
+比如环境:</p>
+<div class="highlight"><pre>base:
+  /data/salt/base
+  /data/salt/base/sls
+</pre></div>
+
+
+<p>会执行/data/salt/base里的sls文件，因为它在前一行</p>
+<p>sls文件基本格式如下：
+例子一  </p>
+<div class="highlight"><pre>/tmp/ttt20:
+  file.managed:
+    - source: salt://files/tst
+    - mode: 700
+    - backup: minion
+    - makedirs: True
+</pre></div>
+
+
+<p>例子二  </p>
+<div class="highlight"><pre><span class="n">testfile</span><span class="o">:</span>
+  <span class="n">file</span><span class="o">.</span><span class="na">managed</span><span class="o">:</span>
+<span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="sr">/tmp/</span><span class="n">ttt20</span>
+    <span class="o">-</span> <span class="n">source</span><span class="o">:</span> <span class="n">salt</span><span class="o">://</span><span class="n">files</span><span class="o">/</span><span class="n">tst</span>
+    <span class="o">-</span> <span class="n">mode</span><span class="o">:</span> <span class="mi">700</span>
+    <span class="o">-</span> <span class="n">backup</span><span class="o">:</span> <span class="n">minion</span>
+    <span class="o">-</span> <span class="n">makedirs</span><span class="o">:</span> <span class="n">True</span>
+</pre></div>
+
+
+<p>如上所示，其实例子一与例子二是达成了一样的效果，只不过写法不一样，像例子一，因为没有- name: /tmp/ttt20所以，它会去第一行的标识作为name，而例子二的testfile可以任意起名，只要不与该文件中的其他标识一样即可。  </p>
+<p>上面的例子达到的功能就是，将/srv/salt/files/tst文件复制到客户端的/tmp/ttt20位置，如果存在则替换，如果已存在且一样则提示is correct state，即已经是正确的状态了。  </p>
+<p>然后就是top.sls，在每个独立的salt环境下有且只能有一个top.sls文件，这个文件为该环境的入口文件，里面记录了目标主机对应的sls文件
+如：  </p>
+<div class="highlight"><pre><span class="n">base</span><span class="o">:</span>
+  <span class="n">minion</span><span class="o">-</span><span class="n">id</span><span class="o">-</span><span class="mi">1</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">test1</span>
+    <span class="o">-</span> <span class="n">test2</span>
+
+  <span class="n">minion</span><span class="o">-</span><span class="n">id</span><span class="o">-</span><span class="mi">2</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">test1</span>
+    <span class="o">-</span> <span class="n">test3</span>
+</pre></div>
+
+
+<p>以tomcat-1为例
+它匹配了</p>
+<div class="highlight"><pre>- test1
+- test2
+</pre></div>
+
+
+<p>上面一共是一个2个sls配置文件，即匹配该环境下的test11.sls，test2.sls文件，所以在执行state模块的时候，它会去检索这些对应的配置文件并执行该配置文件里的内容。<br />
+注：在前面提到过，这些参数前面的空格不能用tab键补全或者少写，不然会报错，再者就是如果配置文件为xxxx.sls  在调用这个配置文件的时候只要写xxxx，即它的文件名，没有后缀，以test1为例</p>
+<div class="highlight"><pre>/tmp/testfile.txt:
+  file.managed:
+    - source: salt://test.txt
+    - mode: 700
+    - user: root
+    - mode: 644
+    - makedirs: True
+</pre></div>
+
+
+<p>功能就是调用file模块，将salt://test.txt（其中,salt://对于该环境的file_root目录，即/data/salt/base）与目标的/tmp/testfile.txt文件做比对，如不一致则更新。并且此文件的拥有者为root mask码为644,如果目标文件目录不存在就创建</p>
+<p>现在回到highstate，sls，show_sls方法
+执行如下  </p>
+<div class="highlight"><pre>salt \* state.sls test
+salt \* state.highstate 
+salt \* state.show_sls test
+</pre></div>
+
+
+<p>上面的意思依次是<br />
+1.在当前环境下寻找test.sls文件并执行<br />
+2.匹配当前环境的top.sls文件所有的sls文件并执行<br />
+3.查看当前环境test.sls文件的执行内容，但是不在客户端执行。  </p>
+<p>注：上面特别提到了是在当前环境，默认情况下，salt只会查找执行base环境下的sls文件，不会执行其他环境的配置文件，所以在不同环境下，需要指 定要执行的配置环境，比如apache环境，只是执行apache的sls文件的话，则需声明saltenv=apache，如下</p>
+<div class="highlight"><pre>salt \* state.sls test saltenv=apache
+salt \* state.highstate saltenv=apache
+salt \* state.show_sls test saltenv=apache
+</pre></div>
+
+
+<p>//////////////////////////下述为个人的安装//////////////////////////////
+在实践state过程，按上面的配置个人搞的不是很明白，改为如下，不使用上述的/etc/salt/master.d/env.conf，修改/etc/salt/master，取消对file_roots的注释；<br />
+在/srv/salt中编辑top.sls，CB_181为monion的key；  </p>
+<div class="highlight"><pre><span class="n">base</span><span class="o">:</span>
+  <span class="n">CB_181</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">dns</span>
+</pre></div>
+
+
+<p>执行命令：  </p>
+<div class="highlight"><pre>mkdir -p /srv/salt/CB_181/files
+</pre></div>
+
+
+<p>在CB_181中编辑dns.sls：  </p>
+<div class="highlight"><pre>/tmp/ttt02:
+  file.managed:
+    - source: salt://CB_181/files/tst
+    - user: root
+    - group: root
+    - mode: 664
+</pre></div>
+
+
+<p>执行命令：  </p>
+<div class="highlight"><pre>echo &quot;hello&quot; &gt; /srv/salt/CB_181/files/tst
+</pre></div>
+
+
+<p>执行命令，注意命令必须是*</p>
+<div class="highlight"><pre>salt \* state.sls CB_181.dns 
+CB_181:
+----------
+          ID: /tmp/ttt02
+    Function: file.managed
+      Result: True
+     Comment: File /tmp/ttt02 is in the correct state
+     Started: 19:40:21.540663
+    Duration: 24.292 ms
+     Changes:
+
+Summary
+------------
+Succeeded: 1
+Failed:    0
+------------
+Total states run:     1
+</pre></div>
+
+
+<p>总结：source: salt://指的是/srv/salt(该路径应该就是/etc/salt/master中的file_roots配置的)</p>
+<p>进一步按照资料配置，注释/etc/salt/master的file_roots，使用/etc/salt/master.d/env.conf，env.conf内容为：  </p>
+<div class="highlight"><pre><span class="n">file_roots</span><span class="o">:</span>
+  <span class="n">base</span><span class="o">:</span>
+    <span class="o">-</span> <span class="sr">/root/data/salt/</span><span class="n">base</span>
+    <span class="o">-</span> <span class="sr">/root/data/salt/base/s</span><span class="n">ls</span>
+</pre></div>
+
+
+<p>则source: salt://指的/root/data/salt/base，只需要在base中加入files目录并添加相应的文件即可。</p>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://blog.chinaunix.net/uid/20681545.html">ChinaUnix</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://dillinger.io/">dillinger</a></li>
+                            <li><a href="http://www.jobbole.com/">jobbole</a></li>
+                            <li><a href="http://linux.chinaunix.net/">linux时代</a></li>
+                            <li><a href="http://pelican-docs-zh-cn.readthedocs.org/en/latest/getting_started.html">pelican快速入门</a></li>
+                            <li><a href="http://sspai.com/">少数派</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
